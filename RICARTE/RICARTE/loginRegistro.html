@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro e Inicio de Sesión</title>
+    <link rel="stylesheet" href="loginRegistro.css">
+    <link rel="icon" href="ux.png">
+</head>
+<body>
+
+<div class="main-container">
+    <div class="options-container">
+        <h2>Selecciona una opción</h2>
+        <button onclick="document.getElementById('id01').style.display='block'" style="width:100%;">Inicio de sesión</button>
+        <button onclick="document.getElementById('id02').style.display='block'" style="width:100%;">Registrarme</button>
+    </div>
+    
+    <div class="image-container">
+        <img src="logo.svg" alt="Imagen descriptiva">
+    </div>
+</div>
+
+<!-- Modal de inicio de sesión -->
+<div id="id01" class="modal">
+  <form id="loginForm" class="modal-content animate">
+    <div class="imgcontainer">
+      <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+      <img src="perfil.png" alt="Avatar" class="avatar">
+    </div>
+
+    <div class="container">
+      <label for="loginUser"><b>Usuario:</b></label>
+      <input type="text" id="loginUser" placeholder="Ingresa tu usuario" name="uname" required>
+      <br><br>
+      <label for="loginPassword"><b>Contraseña:</b></label>
+      <input type="password" id="loginPassword" placeholder="Ingresa tu contraseña" name="psw" required>
+        
+      <button class="btns" type="button" onclick="submitLoginForm()">Iniciar sesión</button>
+    </div>
+
+    <div class="container" style="background-color:#f1f1f1">
+      <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancelar</button>
+    </div>
+  </form>
+</div>
+
+<!-- Modal de registro -->
+<div id="id02" class="modal">
+  <form id="registerForm" class="modal-content animate">
+    <div class="imgcontainer">
+      <span onclick="document.getElementById('id02').style.display='none'" class="close" title="Close Modal">&times;</span>
+      <img src="perfil.png" alt="Avatar" class="avatar">
+    </div>
+
+    <div class="container">
+      <label for="registerUser"><b>Usuario:</b></label>
+      <input type="text" id="registerUser" placeholder="Ingresa tu usuario" name="uname" required>
+      <br><br>
+      <label for="registerPassword"><b>Contraseña:</b></label>
+      <input type="password" id="registerPassword" placeholder="Ingresa tu contraseña" name="psw" required>
+        
+      <button class="btns" type="button" onclick="submitRegisterForm()">Registrarme</button>
+    </div>
+
+    <div class="container">
+      <div id="registerResponse"></div>
+    </div>
+
+    <div class="container" style="background-color:#f1f1f1">
+      <button type="button" onclick="document.getElementById('id02').style.display='none'" class="cancelbtn">Cancelar</button>
+    </div>
+  </form>
+</div>
+
+<!-- Footer -->
+<footer>
+  <p>Perla Cruz y Oscar Hernández - © 2024</p>
+</footer>
+
+<script>
+  // Función para enviar datos de inicio de sesión
+  function submitLoginForm() {
+      const user = document.getElementById('loginUser').value;
+      const password = document.getElementById('loginPassword').value;
+
+      fetch('http://localhost:3000/login', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username: user, password: password })
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              window.location.href = `perfil.html?username=${encodeURIComponent(user)}`;
+          } else {
+              alert('Inicio de sesión fallido: ' + data.error);
+          }
+          document.getElementById('id01').style.display = 'none'; // Cierra el modal
+      })
+      .catch(error => {
+          alert('Error: ' + error.message);
+      });
+  }
+
+  // Función para enviar datos de registro
+  function submitRegisterForm() {
+      const user = document.getElementById('registerUser').value;
+      const password = document.getElementById('registerPassword').value;
+
+      fetch('http://localhost:3000/register', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username: user, password: password })
+      })
+      .then(response => response.json())
+      .then(data => {
+          const registerResponse = document.getElementById('registerResponse');
+          if (data.success) {
+              registerResponse.innerText = 'Registro exitoso';
+              registerResponse.style.color = 'green'; // Color verde para éxito
+          } else {
+              registerResponse.innerText = 'Registro fallido: ' + data.error;
+              registerResponse.style.color = 'red'; // Color rojo para error
+          }
+          document.getElementById('id02').style.display = 'none'; // Cierra el modal
+      })
+      .catch(error => {
+          const registerResponse = document.getElementById('registerResponse');
+          registerResponse.innerText = 'Error: ' + error.message;
+          registerResponse.style.color = 'red'; // Color rojo para error
+      });
+  }
+
+  // Función para cerrar los modales cuando se hace clic fuera de ellos
+  window.onclick = function(event) {
+      const modalLogin = document.getElementById('id01');
+      const modalRegister = document.getElementById('id02');
+      if (event.target == modalLogin) {
+          modalLogin.style.display = "none";
+      }
+      if (event.target == modalRegister) {
+          modalRegister.style.display = "none";
+      }
+  }
+</script>
+
+</body>
+</html>

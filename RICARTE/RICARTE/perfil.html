@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenida</title>
+    <link rel="icon" href="ux.png">
+    <link rel="stylesheet" href="bienvenida.css">
+</head>
+<body>
+    <header>
+        <p>&nbsp; Historial de Entradas/Salidas</p> 
+    </header>
+
+    <div class="header-container">
+        <h2>¡Bienvenid@, <span id="username"></span>!</h2>
+        <h4 id="estado">Estado: </h4>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="uidInput" placeholder="Introduce UID" />
+        <button id="searchButton">Buscar</button>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <tr>
+                <th>Entrada</th>
+                <th>Salida</th>
+                <th>Distancia (cm)</th>
+                <th>Temperatura (°C)</th>
+                <th>Humedad (%)</th>
+            </tr>
+            <tr>
+                <td id="horaEntrada">No disponible</td>
+                <td id="horaSalida">No disponible</td>
+                <td id="distancia">No disponible</td>
+                <td id="temperatura">No disponible</td>
+                <td id="humedad">No disponible</td>
+            </tr>
+        </table>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        <p>Autores: Luis Borja, Perla Cruz, Oscar Hernández - © 2024</p>
+    </footer>
+
+    <script>
+        // Obtener el nombre de usuario de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('username');
+
+        // Mostrar el nombre de usuario
+        document.getElementById('username').innerText = username;
+
+        // Función para buscar los datos del UID
+        async function buscarDatos() {
+            const uid = document.getElementById('uidInput').value;
+            if (!uid) {
+                alert('Por favor, introduce un UID.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/obtener_datos_tarjeta/${uid}`);
+                const data = await response.json();
+                console.log(data);
+                // Actualiza los elementos de la tabla con los datos recibidos
+                document.getElementById('horaEntrada').innerText = data.hora_entrada || 'No disponible';
+                document.getElementById('horaSalida').innerText = data.hora_salida || 'No disponible';
+                document.getElementById('distancia').innerText = data.distancia || 'No disponible';
+                document.getElementById('temperatura').innerText = data.temperatura || 'No disponible';
+                document.getElementById('humedad').innerText = data.humedad || 'No disponible';
+                document.getElementById('estado').innerText = data.estado || 'No disponible';
+            } catch (error) {
+                console.error('Error al obtener los datos:', error.message);
+                alert('Error al obtener los datos. Verifica la consola para más detalles.');
+            }
+        }
+
+        // Asignar la función de búsqueda al botón
+        document.getElementById('searchButton').addEventListener('click', buscarDatos);
+    </script>
+</body>
+</html>
